@@ -1,6 +1,56 @@
 # Movie Recommender System
-____
 Movie recommendation system is a fancy way to describe a process that tries to predict your preferred items based on your or people similar to you. In layman's terms, we can say that a Recommendation System is a tool designed to predict/filter the items as per the user's behavior.
+
+## How do this project works ?
+This project contains two main script one is main.py and one is app.py.
+
+<b>main.py</b> 
+
+    Data Processing:
+    Reads movie data from CSV files.
+    Merges relevant columns for recommendation.
+    Filters out unnecessary data and handles missing values and duplicates.
+    Text Preprocessing:
+
+    Converts strings to lists.
+    Extracts relevant information like genres, keywords, cast, and crew.
+    Cleans and preprocesses text data (e.g., removing spaces, stemming).
+    Vectorization:
+
+    Utilizes CountVectorizer to convert text data into numerical vectors.
+    Calculates cosine similarity between vectors to determine movie similarity.
+    Recommendation:
+
+    Defines a function to recommend similar movies based on a given movie.
+    Calculates similarity scores between movies and returns the top 5 recommendations.
+    Serialization:
+
+    Serializes the preprocessed data and similarity matrix for future use.
+
+<b>app.py</b>
+
+    Fetching Movie Data:
+    Utilizes the TMDB API to fetch movie posters based on movie IDs.
+
+    Recommendation Function:
+    Defines a function to recommend similar movies based on a given movie.
+    Calculates similarity scores between movies and returns the top 5 recommendations along with their posters.
+
+    User Interface:
+    Uses Streamlit to create a simple user interface.
+    Allows users to select a movie from a dropdown menu.
+    Upon clicking the "Recommend" button, displays the top 5 recommended movies along with their posters.
+
+    Loading Preprocessed Data:
+    Loads preprocessed movie data and similarity matrix using pickle.
+    
+    Displaying Recommendations:
+    Displays recommended movies and their posters in a grid layout.
+
+First `main.py` will run and give you `movies_dict.pkl` and `similarity.pkl` then in `app.py` you can use them. 
+
+Then you will go to terminal and type this command <br/>
+`streamlit run app.py`
 
 ### Types of Recommender System
 ____
@@ -15,16 +65,17 @@ ____
 
 In this project we are using CONTENT BASED RECOMMENDER SYSTEM.
 
+
 ### Project Flow
 _____
-| Data | ----->> | Preprocessing | ----->> | Model | ----->> | Website | ----->> | Deploy |
-|------|---------|---------------|---------|-------|---------|---------|---------|--------|
+| Data | ----->> | Preprocessing | ----->> | Model | ----->> | Website |
+|------|---------|---------------|---------|-------|---------|---------|
 
-### Data 
+## Data 
 
 For data, we will be using Kaggale you can use this [link!](https://www.kaggle.com/datasets/tmdb/tmdb-movie-metadata/data)
 
-### Preprocessing
+## Preprocessing
 
 From dataset only take the columns which are necessary or needed for movie recommendation.
 
@@ -42,23 +93,62 @@ Selected column list:
 Then we can start with preprocessing. First we will prepare our data in form of list(genre, cast, keyword, crew, overview)
 
 <b>Selected column list:</b>
-1. genre | genre of all the movies convert into a list
-2. cast  | top 4 cast from movies
-3. keyword  | all keyword of movies in form of list
-4. crew  | only add director of each movie
-5. overview | convert string to list format
+
+    1. genre | genre of all the movies convert into a list
+    2. cast  | top 4 cast from movies
+    3. keyword  | all keyword of movies in form of list
+    4. crew  | only add director of each movie
+    5. overview | convert string to list format
 
 Remove spaces from the data(In case some data like Abhay Kanwasi and Abhay Kumar will create problem because for machine Abhay and Kanwasi is seperate entity)
 
-<b>Data preprocessing</b><br />
-Step1: Convert string object into list format <br />
-Step2: Convert overview into list format <br />
-Step3: Remove space between all entities <br />
+## Data preprocessing
+    Step1: Convert string object into list format 
+    Step2: Convert overview into list format 
+    Step3: Remove space between all entities 
 
 Now add all the output of step1, step2 and step3 and make new column name tags. Then create a new dataframe and put movie_id, title, tags in that.
 Now make tags column string instead of list then lowercase all the strings.
 
+## Model
 <b>Text Vectorization</b></br>
 Convert tags into vectors. There are several techniques for that but the technique we are using here is 'Bag of Words' <br />
-<i>Note: We don't add stop words(ex: are, and, of, from) in vectorization<i/>
+<i>Note: We don't add stop words(ex: are, and, of, from) in vectorization</i>
 
+Make an object of CountVectorizer. Then vectorize new_dataframe['tags]. Then transform this into an array.
+Remove same words from the array(eg. action and actions are same, similarly actor and actors are same)
+Now it's in form of vectors. Now we will calculate the distance between vectors(means distance from each other) We will not use Euclidean distance(calculate points) we will use Cosign distance(calculate the angle between them).
+
+[Note: Much distance mean less similarity. distance inversely proportional to similarity]
+
+#### Make a recommend function which will return top 5 similar movies
+
+This function takes movie as an input and return five similar movie as output
+
+
+    Step1: Calculate the index of the movie in new_dataframe. So we can get the exact movie.
+
+
+    Step2: Use the index as parameter for similarity matrix. Now get the all the distances from the movie.
+
+
+    Step3: Then sort them so we can get the similar movie at the first. Sorting will be in descending order.
+
+Now for this sorted matrix if we do it like this: `sorted(similarity[movie_index], reverse=True)`. 
+
+
+We are checking the similarity based on index and if we sort it it will change the original index and we can't say that which movie is it comparing with. So for this we will use 'enumerate' keyword like this: `list(enumerate(similarity[movie_index], reverse=True))` 
+
+
+It will get the list then we can sort this data like this: `sorted(list(enumerate(similarity[movie_index])), reverse = True)`
+
+
+But the problem arise that it is performing sorting base on first value but we want this according to second value so we will do it like this: `sorted(list(enumerate(similarity[movie_index])), reverse=True, key=lambda x:x[1])`
+
+
+Then we will slice top 5 like this: `sorted(list(enumerate(distances)), reverse=True, key=lambda x:x[1])[1:6]`
+
+
+## Website
+
+For creation of this page we use Streamlit framework. In this page user will search and select the movie and based on that input this app will suggest 5 similar movies to user.

@@ -128,6 +128,5 @@ similarity = cosine_similarity(vectors)
 
 
 new_dataframe = new_dataframe.to_dict()
-# pickle.dump(new_dataframe, open('movies_dict.pkl', 'wb'))
-
+pickle.dump(new_dataframe, open('movies_dict.pkl', 'wb'))
 pickle.dump(similarity, open('similarity.pkl', 'wb'))

@@ -1,6 +1,10 @@
 import numpy as np
 import pandas as pd
 import ast  # convert string to list
+from nltk.stem.porter import PorterStemmer
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import pickle
 
 def convert_object(objects, counts=None, job=None):
     """
@@ -48,6 +52,24 @@ def convert_object(objects, counts=None, job=None):
                     break
             return objects_list
 
+def stem(text):
+    y = []
+    for i in text.split():
+        y.append(ps.stem(i))
+    return " ".join(y)
+
+def recommend(movie):
+    """
+    This function takes movie as an input and return five similar movie as output
+    Step1: Calculate the index of the movie in new_dataframe.
+    Step2: Use the index as parameter for similarity matrix.
+    Step3: Then sort them so we can get the similar movie at the first. Sorting will be in descending order.
+    """
+    movie_index = new_dataframe[new_dataframe['title'] == movie].index[0]
+    distances = similarity[movie_index]
+    movies_list = sorted(list(enumerate(distances)), reverse=True, key=lambda x:x[1])[1:6]
+    for i in movies_list:
+        print(new_dataframe.iloc[i[0]].title)
 
 # SettingWithCopyWarning Resolve
 pd.options.mode.chained_assignment = None
@@ -93,6 +115,19 @@ new_dataframe['tags'] = new_dataframe['tags'].apply(lambda x: " ".join(x))
 
 # Lowercase all the strings(Recommended)
 new_dataframe['tags'] = new_dataframe['tags'].apply(lambda x: x.lower())
-print(new_dataframe['tags'])
+# print(new_dataframe['tags'])
+
+ps = PorterStemmer()
+new_dataframe['tags'].apply(stem)
+new_dataframe['tags'] = new_dataframe['tags'].apply(stem)
+
+cv = CountVectorizer(max_features=5000, stop_words='english') # Object of count vectorizer
+vectors = cv.fit_transform(new_dataframe['tags']).toarray()
+
+similarity = cosine_similarity(vectors)
 
 
+new_dataframe = new_dataframe.to_dict()
+# pickle.dump(new_dataframe, open('movies_dict.pkl', 'wb'))
+
+pickle.dump(similarity, open('similarity.pkl', 'wb'))

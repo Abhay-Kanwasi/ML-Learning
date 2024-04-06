@@ -12,21 +12,21 @@ This project contains two main scripts one is main.py and one is app.py.
     Reads movie data from CSV files.
     Merges relevant columns for recommendation.
     Filters out unnecessary data and handles missing values and duplicates.
-    Text Preprocessing:
 
+    Text Preprocessing:
     Converts strings to lists.
     Extracts relevant information like genres, keywords, cast, and crew.
     Cleans and preprocesses text data (e.g., removing spaces, stemming).
-    Vectorization:
 
+    Vectorization:
     Utilizes CountVectorizer to convert text data into numerical vectors.
     Calculates cosine similarity between vectors to determine movie similarity.
-    Recommendation:
 
+    Recommendation:
     Defines a function to recommend similar movies based on a given movie.
     Calculates similarity scores between movies and returns the top 5 recommendations.
-    Serialization:
 
+    Serialization:
     Serializes the preprocessed data and similarity matrix for future use.
 
 <b>app.py</b>

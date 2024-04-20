@@ -40,37 +40,36 @@ cv = CountVectorizer()
 
 
 def data_preprocessing(text):
-    # lower case
     text = text.lower()
-
-    # tokenization
     text = nltk.word_tokenize(text)
 
-    # removing special characters
-    processed_words = []
+    y = []
     for i in text:
         if i.isalnum():
-            processed_words.append(i)
-    text = processed_words[:]  # you can't copy like text = y bcz list is a mutable data type
-    processed_words.clear()
+            y.append(i)
 
-    # removing stop words amd punctuation
-    ps = PorterStemmer()
-    for word in text:
-        if word not in stopwords.words('english') and word not in string.punctuation:
-            processed_words.append(word)
+    text = y[:]
+    y.clear()
 
-    text = processed_words[:]
-    processed_words.clear()
-
-    # stemming
     for i in text:
-        processed_words.append(ps.stem(i))
+        if i not in stopwords.words('english') and i not in string.punctuation:
+            y.append(i)
 
-    return " ".join(processed_words)
+    text = y[:]
+    y.clear()
+
+    for i in text:
+        y.append(ps.stem(i))
+
+    return " ".join(y)
+
+# import chardet
+# with open('spam.csv', 'rb') as rawdata:
+#     result = chardet.detect(rawdata.read(100000))
+# print(result)
 
 
-df = pd.read_csv('spam.csv', encoding='ISO-8859-1')  # encoding added to read the csv file
+df = pd.read_csv('spam.csv', encoding='Windows-1252')  # encoding added to read the csv file
 # print(df.sample(5))
 df.drop(columns=['Unnamed: 2', 'Unnamed: 3', 'Unnamed: 4'], inplace=True)
 # df.sample(5)
@@ -105,7 +104,7 @@ for msg in df[df['target'] == 0]['transformed_text'].tolist():
         non_spam_corpus.append(word)
 
 # print(df.head)
-
+print(type(df['transformed_text']))
 X = tfidf().fit_transform(df['transformed_text']).toarray()
 # print(x.shape)
 

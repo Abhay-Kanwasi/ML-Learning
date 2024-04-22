@@ -112,4 +112,4 @@ Weighted mean = (0.2 * 10L + 0.3 * 15L + 0.5 * 12L) / 0.2 + 0.3 + 0.5
 
 - Trimmed Mean : Calculated by removing a certain percentage of the smallest and largest values from the dataset and then taking the mean of the remaining values. The percentage of values removed is called the trimming values.
 
-    rent_data = 
+    rent_data = []
